@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head><title>Gallery</title></head>
+<body>
+  <h2>Photo Gallery</h2>
+  {% for file in files %}
+    <div style="margin-bottom: 20px;">
+      <img src="/static/uploads/{{ file }}" width="200"><br>
+      <button onclick="pay('{{ file }}')">Pay ₹10 to Download</button>
+    </div>
+  {% endfor %}
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+function pay(filename) {
+  fetch('/pay', { method: 'POST' })
+    .then(response => response.json())
+    .then(data => {
+      var options = {
+        "key": "{{ key_id }}",
+        "amount": data.amount,
+        "currency": "INR",
+        "name": "Photo Download",
+        "description": "Download after payment",
+        "order_id": data.id,
+        "handler": function (response){
+            window.location.href = "/download/" + filename;
+        }
+      };
+      var rzp1 = new Razorpay(options);
+      rzp1.open();
+    });
+}
+</script>
+</body>
+</html>
